@@ -14,8 +14,9 @@ import {
 import * as fs from "fs";
 import * as path from "path";
 import * as AdmZip from "adm-zip";
+import { storageDir } from "./extension";
 
-let openedFileUri: Uri;
+let openedFileUri: Uri | undefined = undefined;
 
 class ZipDocument implements CustomDocument {
   static async create(
@@ -72,7 +73,9 @@ class ZipDocument implements CustomDocument {
     this._data = data;
   }
 
-  dispose(): void {}
+  dispose(): void {
+    openedFileUri = undefined;
+  }
 }
 
 export class ZipEditorProvider implements CustomReadonlyEditorProvider {
@@ -110,7 +113,15 @@ export class ZipEditorProvider implements CustomReadonlyEditorProvider {
           return;
         case "openFile":
           if (openedFileUri !== undefined) {
-            // todo
+            const zip = new AdmZip(openedFileUri.fsPath);
+            const path = extractFileFromZip(zip, msg.entryName);
+            if (path === undefined || path === "") {
+              window.showInformationMessage(
+                `extract entry ${msg.entryName} failed`
+              );
+            }
+            commands.executeCommand("workbench.action.closeActiveEditor");
+            commands.executeCommand("vscode.open", path);
           }
           return;
         case "revealFile":
@@ -207,4 +218,20 @@ function getExtensionFileVscodeResource(
 ): string {
   const diskPath = Uri.file(path.join(context.extensionPath, relativePath));
   return diskPath.with({ scheme: "vscode-resource" }).toString();
+}
+
+const cacheDir = "cache";
+
+export function extractFileFromZip(zip: AdmZip, entryName: string) {
+  const filePath = path.join(storageDir, cacheDir, entryName);
+  const success = zip.extractEntryTo(
+    entryName,
+    path.join(storageDir, cacheDir),
+    true,
+    true
+  );
+  if (success) {
+    return Uri.parse(filePath);
+  }
+  return "";
 }

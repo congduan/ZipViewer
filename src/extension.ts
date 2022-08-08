@@ -1,14 +1,13 @@
-import * as vscode from 'vscode';
-import {ZipEditorProvider} from "./editor";
+import * as vscode from "vscode";
+import { ZipEditorProvider } from "./editor";
+
+export let storageDir = "";
 
 export function activate(context: vscode.ExtensionContext) {
-	
-	let openZipFile = vscode.commands.registerCommand('zipviewer.open', () => {
-		vscode.window.showInformationMessage('Hello World from ZipViewer!');
-	});
+  storageDir =
+    context.storageUri?.fsPath === undefined ? "" : context.storageUri?.fsPath;
 
-	context.subscriptions.push(openZipFile);
-	context.subscriptions.push(ZipEditorProvider.register(context));
+  context.subscriptions.push(ZipEditorProvider.register(context));
 }
 
 export function deactivate() {}
