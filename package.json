@@ -2,12 +2,20 @@
   "name": "zipviewer",
   "publisher": "congduan",
   "displayName": "ZipViewer",
+  "license": "MIT",
   "description": "a simple zip file viewer",
+  "homepage": "https://github.com/congduan/ZipViewer/blob/main/README.md",
   "version": "0.0.1",
   "repository": {
-		"type": "",
-		"url": ""
+		"type": "github",
+		"url": "https://github.com/congduan/ZipViewer.git"
 	},
+  "bugs": {
+    "url": "https://github.com/congduan/ZipViewer/issues"
+  },
+  "keywords": [
+    "zip",
+  ],
   "engines": {
     "vscode": "^1.70.0"
   },
